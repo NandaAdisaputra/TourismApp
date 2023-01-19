@@ -6,15 +6,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.nandaadisaputra.tourismapp.R
-import com.nandaadisaputra.tourismapp.core.data.source.local.entity.TourismEntity
+import com.nandaadisaputra.tourismapp.core.domain.model.Tourism
 import com.nandaadisaputra.tourismapp.databinding.ItemListTourismBinding
 
 class TourismAdapter : RecyclerView.Adapter<TourismAdapter.ListViewHolder>() {
 
-    private var listData = ArrayList<TourismEntity>()
-    var onItemClick: ((TourismEntity) -> Unit)? = null
+    //    private var listData = ArrayList<TourismEntity>()
+//    var onItemClick: ((TourismEntity) -> Unit)? = null
+    private var listData = ArrayList<Tourism>()
+    var onItemClick: ((Tourism) -> Unit)? = null
 
-    fun setData(newListData: List<TourismEntity>?) {
+    //    fun setData(newListData: List<TourismEntity>?) {
+    fun setData(newListData: List<Tourism>?) {
         if (newListData == null) return
         listData.clear()
         listData.addAll(newListData)
@@ -22,7 +25,9 @@ class TourismAdapter : RecyclerView.Adapter<TourismAdapter.ListViewHolder>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        ListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_list_tourism, parent, false))
+        ListViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.item_list_tourism, parent, false)
+        )
 
     override fun getItemCount() = listData.size
 
@@ -31,9 +36,12 @@ class TourismAdapter : RecyclerView.Adapter<TourismAdapter.ListViewHolder>() {
         holder.bind(data)
     }
 
+    //    inner class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     inner class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val binding = ItemListTourismBinding.bind(itemView)
-        fun bind(data: TourismEntity) {
+
+        //            fun bind(data: TourismEntity) {
+        fun bind(data: Tourism) {
             with(binding) {
                 Glide.with(itemView.context)
                     .load(data.image)
