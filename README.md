@@ -1,2 +1,2 @@
 # TourismApp
-Latihan  Android Architecture Component
+Latihan Clean Arsitektur
