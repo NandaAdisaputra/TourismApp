@@ -15,6 +15,10 @@ import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import org.json.JSONException
 import retrofit2.Call
 import retrofit2.Callback
@@ -35,12 +39,12 @@ class RemoteDataSource private constructor(private val apiService: ApiService) {
     }
 
     //    fun getAllTourism(): LiveData<ApiResponse<List<TourismResponse>>> {
-    fun getAllTourism(): Flowable<ApiResponse<List<TourismResponse>>> {
+    fun getAllTourism(): Flow<ApiResponse<List<TourismResponse>>> {
 //        val resultData = MutableLiveData<ApiResponse<List<TourismResponse>>>()
-        val resultData = PublishSubject.create<ApiResponse<List<TourismResponse>>>()
+//        val resultData = PublishSubject.create<ApiResponse<List<TourismResponse>>>()
 
         //get data from local json
-        val client = apiService.getList()
+//        val client = apiService.getList()
 //        val handler = Handler(Looper.getMainLooper())
 //        handler.postDelayed({
 //            try {
@@ -76,19 +80,34 @@ class RemoteDataSource private constructor(private val apiService: ApiService) {
 //                Log.e("RemoteDataSource", t.message.toString())
 //            }
 //        })
-        client
-            .subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
-            .take(1)
-            .subscribe ({ response ->
+//        client
+//            .subscribeOn(Schedulers.computation())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .take(1)
+//            .subscribe ({ response ->
+//                val dataArray = response.places
+//                resultData.onNext(if (dataArray.isNotEmpty()) ApiResponse.Success(dataArray) else ApiResponse.Empty)
+//            }, { error ->
+//                resultData.onNext(ApiResponse.Error(error.message.toString()))
+//                Log.e("RemoteDataSource", error.toString())
+//            })
+//
+////        return resultData
+//        return resultData.toFlowable(BackpressureStrategy.BUFFER)
+//    }
+        return flow {
+            try {
+                val response = apiService.getList()
                 val dataArray = response.places
-                resultData.onNext(if (dataArray.isNotEmpty()) ApiResponse.Success(dataArray) else ApiResponse.Empty)
-            }, { error ->
-                resultData.onNext(ApiResponse.Error(error.message.toString()))
-                Log.e("RemoteDataSource", error.toString())
-            })
-
-//        return resultData
-        return resultData.toFlowable(BackpressureStrategy.BUFFER)
+                if (dataArray.isNotEmpty()){
+                    emit(ApiResponse.Success(response.places))
+                } else {
+                    emit(ApiResponse.Empty)
+                }
+            } catch (e : Exception){
+                emit(ApiResponse.Error(e.toString()))
+                Log.e("RemoteDataSource", e.toString())
+            }
+        }.flowOn(Dispatchers.IO)
     }
 }
